@@ -4,7 +4,9 @@ import { returnNumberColor } from "./pagehelperService";
 
 const useMainPageHook = (url: string, dispatch: any) => {
     const oldvalue = React.useRef(0);
-    const [numberColor, setnumberColor] = React.useState("text-white");
+    const [numberColor, setnumberColor] = React.useState(
+        "text-white text-green-500 text-red-500"
+    );
 
     const handleMessage = (event: { data: number }) => {
         dispatch(updateNumber(event.data));
