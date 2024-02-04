@@ -1,26 +1,18 @@
-import { combineReducers, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { initialStateType } from "@/types/types";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-type initialState = {
-    value: valueTypes;
+const initialState: initialStateType = {
+    number: 0,
 };
-type valueTypes = {
-    number: number;
-};
-const initialState = {
-    value: {
-        number: 0,
-    },
-} as initialState;
 
 export const slice = createSlice({
-    name: "connect",
+    name: "slice",
     initialState,
     reducers: {
         updateNumber: (state, action: PayloadAction<number>) => {
             return {
-                value: {
-                    number: action.payload,
-                },
+                ...state,
+                number: action.payload,
             };
         },
     },

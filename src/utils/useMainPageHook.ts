@@ -1,41 +1,35 @@
-import React, { useEffect } from "react";
-import { updateNumber } from "../redux/slice";
+import React from "react";
 import { returnNumberColor } from "./pagehelperService";
+import { AppDispatch, useAppSelector } from "../redux/store";
+import { useDispatch } from "react-redux";
+import { colorDictonary, mainPageHooksReturnType } from "../types/types";
 
-const useMainPageHook = (url: string, dispatch: any) => {
+const useMainPageHook = (): mainPageHooksReturnType => {
+    const dispatch = useDispatch<AppDispatch>();
+    const number = useAppSelector(({ fileReducer }) => fileReducer.number);
     const oldvalue = React.useRef(0);
-    const [numberColor, setnumberColor] = React.useState(
-        "text-white text-green-500 text-red-500"
+    const [numberColor, setNumberColor] = React.useState<colorDictonary>(
+        colorDictonary.white
     );
 
-    const handleMessage = (event: { data: number }) => {
-        dispatch(updateNumber(event.data));
-        const numberColor = returnNumberColor(oldvalue.current, event.data);
-        setnumberColor(numberColor);
-        oldvalue.current = event.data;
+    const handleMessage = (message: number) => {
+        const numberColor = returnNumberColor(oldvalue.current, message);
+        setNumberColor(numberColor);
+        oldvalue.current = message;
     };
 
-    useEffect(() => {
-        const socket = new WebSocket(url);
-        const handleOpen = (event: any) =>
-            console.log("WebSocket connection opened:", event);
-        const handleClose = (event: any) =>
-            console.log("WebSocket connection closed:", event);
+    React.useEffect(() => {
+        handleMessage(number);
+    }, [number]);
 
-        socket.addEventListener("open", handleOpen);
-        socket.addEventListener("message", handleMessage);
-        socket.addEventListener("close", handleClose);
-
-        // Cleanup on component unmount
+    React.useEffect(() => {
+        dispatch({ type: "socket/connect" });
         return () => {
-            socket.close();
-            socket.removeEventListener("open", handleOpen);
-            socket.removeEventListener("message", handleMessage);
-            socket.removeEventListener("close", handleClose);
+            dispatch({ type: "socket/disconnect" });
         };
-    }, []); // Reconnect if the URL changes
+    }, []);
 
-    return { numberColor };
+    return { numberColor, number };
 };
 
 export default useMainPageHook;
